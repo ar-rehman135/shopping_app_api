@@ -21,5 +21,5 @@ class Brands(Base):
     def toDict(self):
         u = {"brand_name": self.brand_name, "shopkeeper_id":self.shopkeeper_id}
         return u
-class Quality(Base):
-    __tablename
+#class Quality(Base):
+ #   __tablename

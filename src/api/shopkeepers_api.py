@@ -28,7 +28,9 @@ def insert_shop_keeper():
     shop_phone_no2 = request.json.get('shop_phone_no2')
     loc_long = request.json.get('loc_long')
     loc_lat = request.json.get('loc_lat')
-    s = ShopKeepers(user_name,shop_name,password,owner_name,owner_phone_no,shop_phone_no1,shop_phone_no2,loc_long,loc_lat,address)
+    image = request.json.get('image')
+    email  = request.json.get('email')
+    s = ShopKeepers(user_name,shop_name,password,owner_name,owner_phone_no,shop_phone_no1,shop_phone_no2,loc_long,loc_lat,address,image,email)
     res = UAP.process_insert_shopkeeper(s)
     return res
 
@@ -56,6 +58,4 @@ def logout_shopkeeper():
 @shopkeeper_bp.route("/update_password",methods=['POST'])
 def update_password():
     return UAP.update_pass_shop(request.json)
-
-
 

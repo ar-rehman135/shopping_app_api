@@ -12,21 +12,24 @@ from werkzeug.security import generate_password_hash, check_password_hash
 class UserAccountsProcessor:
 
     def process_insert_shopkeeper(self,s):
-        if(not s.user_name or not s.owner_name or  not s.shop_name or not s.owner_phone_no or not s.password or not s.address):
-            return common.make_response_packet(6, "data is not valid", s.toDict())
+        if(not s.user_name or not s.owner_name or  not s.shop_name or not s.owner_phone_no or not s.password or not s.address ):
+            return common.make_response_packet(6, "Data is not valid", s.toDict())
         is_user_exist = ShopKeepers.query.filter(ShopKeepers.user_name == s.user_name).first() != None
         if(is_user_exist):
             return common.make_response_packet(7, "User name already in use", None)
         is_ownerphone_no_exist = ShopKeepers.query.filter(ShopKeepers.owner_phone_no == s.owner_phone_no).first() != None
         if (is_ownerphone_no_exist):
             return common.make_response_packet(7, "Phone number already in use", None)
-        #is_shop_name_exist = ShopKeepers.query.filter(ShopKeepers.shop_name == s.shop_name).first() != None
-        #if (is_shop_name_exist):
-          #  return common.make_response_packet(7, "shop name already in use", None)
+        is_shop_name_exist = ShopKeepers.query.filter(ShopKeepers.shop_name == s.shop_name).first() != None
+        if (is_shop_name_exist):
+            return common.make_response_packet(7, "Shop name already in use", None)
+        is_email_exist = ShopKeepers.query.filter(ShopKeepers.email == s.email).first() != None
+        if (is_email_exist):
+            return common.make_response_packet(7, "Email Already Exists", None)
         s.password=generate_password_hash(s.password)
         db_session.add(s)
         db_session.commit()
-        return common.make_response_packet(0, "shop keeper inserted successfully", s.toDict())
+        return common.make_response_packet(0, "Shop keeper Inserted Successfully", s.toDict())
 
 
     def update_shopkeeper(self,s):
@@ -34,7 +37,7 @@ class UserAccountsProcessor:
         if (not authentic):
             return common.make_response_packet(4, "User is not authenticated", None)
         if (not s['shopkeeper_id']):
-            return common.make_response_packet(5,'shopkeeper id is required',None)
+            return common.make_response_packet(5,'Shopkeeper id is required',None)
         shop = ShopKeepers.query.filter(ShopKeepers.id== s['shopkeeper_id']).first()
         if (not shop):
             return common.make_response_packet(6,'shopkeeper_id is not valid',None)
@@ -43,21 +46,18 @@ class UserAccountsProcessor:
         for k in keys:
             updated |= common.check_and_update(shop,s,k.name)
         if(updated):
-            if(not shop.user_name or not shop.owner_name or  not shop.shop_name or not shop.owner_phone_no or not shop.password or not shop.address):
-                return common.make_response_packet(6, "Data is not valid", None)
-            is_user_exist = ShopKeepers.query.filter(and_(ShopKeepers.user_name == shop.user_name,ShopKeepers.id != shop.id)).first() != None
-            if (is_user_exist):
-                return common.make_response_packet(7, "User name already in use", None)
-            #is_shop_name_exist = ShopKeepers.query.filter(and_(ShopKeepers.shop_name == shop.shop_name,ShopKeepers.id != shop.id)).first() != None
-            #if (is_shop_name_exist):
-              #  return common.make_response_packet(7, "shop name already in use", None)
+            #if(not shop.user_name or not shop.owner_name or  not shop.shop_name or not shop.owner_phone_no or not shop.password or not shop.address):
+             #   return common.make_response_packet(6, "Data is not valid", None)
+            #is_user_exist = ShopKeepers.query.filter(and_(ShopKeepers.user_name == shop.user_name,ShopKeepers.id != shop.id)).first() != None
+            #if (is_user_exist):
+             #   return common.make_response_packet(7, "User name already in use", None)
+            is_shop_name_exist = ShopKeepers.query.filter(and_(ShopKeepers.shop_name == shop.shop_name,ShopKeepers.id != shop.id)).first() != None
+            if (is_shop_name_exist):
+                return common.make_response_packet(7, "Shop name already in use", None)
             db_session.commit()
-            return common.make_response_packet(0, "Shopkeeper updated successfully", shop.toDict())
+            return common.make_response_packet(0, "Updated successfully", shop.toDict())
         else:
             return common.make_response_packet(1, 'Nothing Updated', shop.toDict())
-
-
-
 
     def process_login(self,user_name,password,user_type):
         s = None
@@ -74,12 +74,12 @@ class UserAccountsProcessor:
             return common.make_response_packet(3, "User Name or Password is Incorrect", None)
         session[constants.is_authenticated] = True
         session[constants.user_type] = user_type
-        return  common.make_response_packet(0,"Login Successfully", None)
+        return  common.make_response_packet(0,"Login Successfully",s.toDict())
 
     def process_logout(self):
         session[constants.is_authenticated] = None
         session[constants.user_type] = None
-        return common.make_response_packet(0,"logout successfully",None)
+        return common.make_response_packet(0,"Logout Successfully",None)
 
     def process_insert_customers(self, c: Customers):
         if (not c.user_name or not c.customer_name or not c.image or not c.cnic_no or not c.password or not c.customer_phone_no):
@@ -149,15 +149,14 @@ class UserAccountsProcessor:
             return common.make_response_packet(21,"Data is not valid",None)
         correct = check_password_hash(shop.password,s['old_password'])
         if correct:
-            issubclass(hifi,price,discount)
-            {
-                juf = id.__annotations__.id.not.
-            }
+            #issubclass(hifi,price,discount){
+             #   juf = id.__annotations__.id.not
+            #}
             shop.password = generate_password_hash(s['new_password'])
             db_session.commit()
-            return common.make_response_packet(0, "Password Updated Successfully", shop.toDict())
+            return common.make_response_packet(0, "Password Updated Successfully", 'Server Data')
         else:
-            return common.make_response_packet(1, 'Nothing Updated', shop.toDict())
+            return common.make_response_packet(1, 'Incorrect Old Password', 'Server Data')
 
 
 

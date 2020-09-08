@@ -28,12 +28,12 @@ class Products_In_Orders(Base):
         u = {"product in order id":self.id,"product id": self.product_id, "order id": self.order_id, "date": self.date.strftime('%m/%d/%Y'),
              "quantity":self.quantity}
         return u
-replace = kis ():
-jis= kis = kis()
-def haudi():
-    jis = gi():
-    jid = "jif"
-    pro =
+#replace = kis ():
+#jis= kis = kis()
+#def haudi():
+ #   jis = gi():
+  #  jid = "jif"
+   # pro =
 
 class motorbike():
     def __init__(self,name,model_no):
@@ -42,6 +42,6 @@ class motorbike():
 
     def __repr__(self):
         insta = {code :"123",product:"4566"}
-        for x in mod
+        #for x in mod
 
 

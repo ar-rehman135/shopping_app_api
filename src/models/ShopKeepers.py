@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Float
+from sqlalchemy import Column, Integer, String, ForeignKey, Float, BLOB
 from sqlalchemy.orm import relationship
 
 from src.database.db import Base
@@ -17,8 +17,8 @@ class ShopKeepers(Base):
     loc_lat = Column(Float)
     address = Column(String(250))
     password = Column(String(120))
-
-
+    image = Column(BLOB)
+    email = Column(String(120), unique=True)
     def __init__(self,
                  user_name = None,
                  shop_name=None,
@@ -29,7 +29,9 @@ class ShopKeepers(Base):
                  shop_phone_no2=None,
                  loc_long=None,
                  loc_lat=None,
-                 address=None):
+                 address=None,
+                 image=None,
+                 email = None):
         self.user_name = user_name
         self.shop_name = shop_name
         self.owner_name = owner_name
@@ -40,11 +42,25 @@ class ShopKeepers(Base):
         self.loc_lat = loc_lat
         self.address = address
         self.password = password
+        self.image = image
+        self.email = email
         brands_rel = relationship("Brands")
 
     def __repr__(self):
         return '<User %r>' % (self.name)
 
     def toDict(self):
-        u = {"username":self.user_name,"shopkeeper_id":self.id,"shop name": self.shop_name, "owner name": self.owner_name, "owner phone no": self.owner_phone_no}
+        u = {"user_name" : self.user_name,
+        "shop_name" : self.shop_name,
+        "owner_name" : self.owner_name,
+        "owner_phone_no" : self.owner_phone_no,
+        "shop_phone_no1" : self.shop_phone_no1,
+        "shop_phone_no2" : self.shop_phone_no2,
+        "loc_long" : self.loc_long,
+        "loc_lat" : self.loc_lat,
+        "address" : self.address,
+        "image" : self.image,
+        "email" : self.email,
+        "shopkeeper_id":self.id
+             }
         return u

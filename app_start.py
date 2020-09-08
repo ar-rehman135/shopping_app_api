@@ -23,6 +23,5 @@ app.register_blueprint(product_in_order_api.products_in_orders_bp)
 app.register_blueprint(customer_add_shops_api.customer_add_shops_bp)
 if __name__ == "__main__":
     init_db()
-    app.run(debug = True,host="192.168.0.109")
-
-
+    app.run(debug = True,host="192.168.1.13")
+6

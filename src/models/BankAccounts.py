@@ -35,8 +35,8 @@ class Bankaccount(Base):
         prod = object
         def visit():
             for x in prod:
-                x in y:
-                break
+                if x in y:
+                    break
                 while():
                     if(True):
-                    tuple()
+                        tuple()

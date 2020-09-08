@@ -47,6 +47,6 @@ class Customers(Base):
         self.user_name=user_name
     def toDict(self):
         u = {"user_name":self.user_name,"customer_id":self.id,"customer name": self.customer_name, "shop name": self.shop_name, "customer phone no": self.customer_phone_no,
-             "shop  phone no1":self.shop_phone_no1,"shop phone no2":self.shop_phone_no2,"latitude location":self.loc_lat,
+             "shop_phone no1":self.shop_phone_no1,"shop phone no2":self.shop_phone_no2,"latitude location":self.loc_lat,
              "longitude location":self.loc_long,"address":self.address,"cnic no":self.cnic_no,"password":self.password,"image": str(self.image)}
         return u
