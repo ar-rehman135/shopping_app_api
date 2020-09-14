@@ -18,19 +18,25 @@ brands_bp = Blueprint('brands', __name__, url_prefix='/brands')
 def insert_brands():
     brand_name = request.json.get('brand_name')
     shopkeeper_id = request.json.get('shopkeeper_id')
-    b = Brands(brand_name,shopkeeper_id)
+    own_brand = request.json.get("own_brand")
+    #print("This is ownbrand",own_brand)
+    b = Brands(brand_name,shopkeeper_id,own_brand)
     res =OPP.process_insert_brands(b)
     return res
 
 @brands_bp.route("/list_brands",methods=['POST'])
-def list_bankacount():
-    u = Brands.query.all()
-    ul = [us.toDict() for us in u]
-    return json.dumps(ul)
+def list_brands():
+    return OPP.get_brands(request.get_json())
+
+
 
 @brands_bp.route('/update_brand',methods=['POST'])
 def update_brand():
     return OPP.update_brand(request.get_json())
+
+@brands_bp.route('/delete_brand',methods=['POST'])
+def delete_brand():
+    return OPP.delete_brand(request.get_json())
 
 
 

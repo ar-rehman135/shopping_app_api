@@ -5,11 +5,16 @@ from src.database.db import init_db
 app = Flask(__name__, instance_relative_config=True,static_folder="static/dist",template_folder="static")
 app.config.from_mapping(
     SECRET_KEY = 'DEV')
+import os
 
 @app.before_request
 def make_session_permanent():
     session.permanent = True
     app.permanent_session_lifetime = timedelta(minutes=10)
+
+#UPLOAD_FOLDER =
+#ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
+#app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 
 app.register_blueprint(shopkeepers_api.shopkeeper_bp)
@@ -21,7 +26,8 @@ app.register_blueprint(customers_api.customers_bp)
 app.register_blueprint(orders_api.orders_bp)
 app.register_blueprint(product_in_order_api.products_in_orders_bp)
 app.register_blueprint(customer_add_shops_api.customer_add_shops_bp)
+
+
 if __name__ == "__main__":
     init_db()
-    app.run(debug = True,host="192.168.1.13")
-6
+    app.run(debug = True,host="192.168.1.2")

@@ -41,6 +41,7 @@ class UserAccountsProcessor:
         shop = ShopKeepers.query.filter(ShopKeepers.id== s['shopkeeper_id']).first()
         if (not shop):
             return common.make_response_packet(6,'shopkeeper_id is not valid',None)
+
         keys = shop.__table__.columns
         updated =False
         for k in keys:
@@ -54,6 +55,8 @@ class UserAccountsProcessor:
             is_shop_name_exist = ShopKeepers.query.filter(and_(ShopKeepers.shop_name == shop.shop_name,ShopKeepers.id != shop.id)).first() != None
             if (is_shop_name_exist):
                 return common.make_response_packet(7, "Shop name already in use", None)
+
+
             db_session.commit()
             return common.make_response_packet(0, "Updated successfully", shop.toDict())
         else:

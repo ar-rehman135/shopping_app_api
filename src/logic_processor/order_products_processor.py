@@ -4,7 +4,7 @@ from src.models.Brands import Brands
 from src.models.Orders import Orders
 from src.models.Products_In_Orders import Products_In_Orders
 from src.dto.UserType import UserType
-from flask import session
+from flask import session, jsonify
 from src.logic_processor import constants
 from src.logic_processor import common
 from src.models.BankAccounts import Bankaccount
@@ -90,14 +90,19 @@ class OrderProductsProcessor:
         if (not authentic):
             return common.make_response_packet(4, "User is not authenticated", None)
         if (not common.is_shopkeeper()):
-            return common.make_response_packet(6, "you are not authorize to add brands", None)
+            return common.make_response_packet(6, "You are not authorize to add brands", None)
         validated = self.validate_brands(a)
         if (validated !=True):
             return validated
+        select_shop_keeper = Brands.query.filter(Brands.shopkeeper_id == a.shopkeeper_id).all()
+        if select_shop_keeper:
+            for i in range(len(select_shop_keeper)):
+                if a.brand_name == select_shop_keeper[i].brand_name:
+                    return common.make_response_packet(7, "Brand Name already exists", None)
 
         db_session.add(a)
         db_session.commit()
-        return common.make_response_packet(2, "Brand inserted successfully", a.toDict())
+        return common.make_response_packet(0, "Brand inserted successfully", a.toDict())
 
 ###############################################################################
 
@@ -106,6 +111,28 @@ class OrderProductsProcessor:
            return common.make_response_packet(1, "data is not valid", None)
         return True
 
+###############################################################################
+
+    def get_brands(self, br):
+        authentic = common.is_user_authenticated()
+        if (not authentic):
+            return common.make_response_packet(4, "User is not authenticated", None)
+        if 'shopkeeper_id' not in br:
+            return common.make_response_packet(5, 'Shop Keeper id is required', None)
+        brn = Brands.query.filter(Brands.shopkeeper_id == br['shopkeeper_id']).all()
+        brands_data = []
+        if brn:
+            for brands in brn:
+                brands_data.append({
+                    'id': brands.id,
+                    'name': brands.brand_name,
+                    'own_brand': brands.own_brand
+                })
+            return jsonify(brands_data)
+        else:
+            return common.make_response_packet(4, "No Data", None)
+
+###############################################################################
 
 ###############################################################################
 
@@ -113,26 +140,54 @@ class OrderProductsProcessor:
         authentic = common.is_user_authenticated()
         if (not authentic):
             return common.make_response_packet(4, "User is not authenticated", None)
-        if 'brand_id' not in br:
+        if 'id' not in br:
             return common.make_response_packet(5, 'brand id is required', None)
-        brn = Brands.query.filter(Brands.id == br['brand_id']).first()
+        if br.get('brand_name'):
+            select_shop_keeper = Brands.query.filter(Brands.shopkeeper_id == br['shopkeeper_id']).all()
+            if select_shop_keeper:
+                for i in range(len(select_shop_keeper)):
+                    if br['brand_name'] == select_shop_keeper[i].brand_name:
+                        return common.make_response_packet(7, "Brand Name already exists", None)
+
+        brn = Brands.query.filter(Brands.id == br['id'] and Brands.shopkeeper_id == br['shopkeeper_id']).first()
         if (not brn):
-            return common.make_response_packet(6, 'brand_id is not valid', None)
+            return common.make_response_packet(6, 'Brand_id is not valid', None)
         keys = brn.__table__.columns
         updated = False
         for k in keys:
             updated |= common.check_and_update(brn, br, k.name)
         if (updated):
             if (not common.is_shopkeeper()):
-                return common.make_response_packet(6, "you are not authorize to add brands", None)
-            if (not brn.shopkeeper_id or not brn.brand_name):
-                return common.make_response_packet(1, "data is not valid", None)
+                return common.make_response_packet(6, "You are not authorize to update brands", None)
             db_session.commit()
-            return common.make_response_packet(0, "brand successfully updated", brn.toDict())
+            return common.make_response_packet(0, "Brand successfully updated", brn.toDict())
         else:
             return common.make_response_packet(1, 'Nothing Updated', brn.toDict())
 
 ###############################################################################
+
+###############################################################################
+
+    def delete_brand(self, br):
+        authentic = common.is_user_authenticated()
+        if (not authentic):
+            return common.make_response_packet(4, "User is not authenticated", None)
+        if 'id' not in br:
+            return common.make_response_packet(5, 'brand id is required', None)
+        brn = Brands.query.filter(Brands.id == br['id'] and Brands.shopkeeper_id == br['shopkeeper_id']).first()
+        if (not brn):
+            return common.make_response_packet(6, 'Data is not valid', None)
+        if brn:
+            if (not common.is_shopkeeper()):
+                return common.make_response_packet(6, "You are not authorize to delete brands", None)
+            db_session.delete(brn)
+            db_session.commit()
+            return common.make_response_packet(0, "Brand successfully Deleted",'')
+        else:
+            return common.make_response_packet(1, 'Nothing Deleted','')
+
+###############################################################################
+
 
     def process_insert_orders(self, a: Orders):
         authentic = common.is_user_authenticated()
