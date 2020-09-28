@@ -68,32 +68,12 @@ def update_password():
 
 
 
-@shopkeeper_bp.route("/upload_file",methods=['GET','POST'])
-def fileUpload():
-    target = os.path.abspath("static/")
-    user_profile_direc = os.path.join(target,"user")
-    print(target)
-    print(user_profile_direc)
-    if not os.path.isdir(user_profile_direc):
-        os.mkdir(user_profile_direc)
-    #logger.info("welcome to upload`")
-    file = request.json
-    f = file['file_attachement']
-    #print(f)
-    f = bytes(f,'utf-8')
+@shopkeeper_bp.route("/update_user_picture",methods=['GET','POST'])
+def update_shop_picture():
+    return UAP.update_shopkeeper_picture(request.json)
 
-    #filename = secure_filename(file.filename)
-
-    #imgdata = base64.b64decode(f)
-    filename = uuid.uuid1().hex
-    destination = "/".join([user_profile_direc, filename])
-    print(destination)
-    with open(destination + ".jpg", "wb") as fh:
-        fh.write(base64.decodebytes(f))
-    #file.save(destination)
-    #session['uploadFilePath'] = destination
-    response = "Whatever you wish too return"
-    return common.make_response_packet(1, 'Incorrect Old Password', 'Server Data')
-
+@shopkeeper_bp.route("/get_user_picture",methods=['GET','POST'])
+def get_shop_picture():
+    return UAP.get_shopkeeper_picture(request.json)
 
 

@@ -17,7 +17,7 @@ class ShopKeepers(Base):
     loc_lat = Column(Float)
     address = Column(String(250))
     password = Column(String(120))
-    image = Column(BLOB)
+    image = Column(String(500))
     email = Column(String(120), unique=True)
     def __init__(self,
                  user_name = None,

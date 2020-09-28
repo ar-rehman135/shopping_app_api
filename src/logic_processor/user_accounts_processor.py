@@ -1,3 +1,6 @@
+import base64
+import uuid
+
 from src.database.db import db_session
 from src.models.ShopKeepers import ShopKeepers
 from src.models.Customers import Customers
@@ -8,6 +11,7 @@ from sqlalchemy import and_
 from src.logic_processor import constants
 from src.logic_processor import common
 from werkzeug.security import generate_password_hash, check_password_hash
+import os
 
 class UserAccountsProcessor:
 
@@ -61,6 +65,66 @@ class UserAccountsProcessor:
             return common.make_response_packet(0, "Updated successfully", shop.toDict())
         else:
             return common.make_response_packet(1, 'Nothing Updated', shop.toDict())
+
+    def update_shopkeeper_picture(self,s):
+        authentic = common.is_user_authenticated()
+        if (not authentic):
+            return common.make_response_packet(4, "User is not authenticated", None)
+        target = os.path.abspath("static/")
+        if (not s['shopkeeper_id']):
+            return common.make_response_packet(5, 'Shopkeeper id is required', None)
+        shop = ShopKeepers.query.filter(ShopKeepers.id == s['shopkeeper_id']).first()
+        if (not shop):
+            return common.make_response_packet(6, 'shopkeeper_id is not valid', None)
+        user_folder_create = os.path.join(target,shop.user_name)
+        if not os.path.isdir(user_folder_create):
+            os.mkdir(user_folder_create)
+        user_profile_direc = os.path.join(user_folder_create,"profile_pics")
+        print(target)
+        print(user_profile_direc)
+        if not os.path.isdir(user_profile_direc):
+            os.mkdir(user_profile_direc)
+
+        f = s['file_attachement']
+        f = bytes(f, 'utf-8')
+
+        filename = uuid.uuid1().hex
+        shop.image = filename
+        destination = "/".join([user_profile_direc, filename])
+        print(destination)
+        with open(destination + ".jpg", "wb") as fh:
+            fh.write(base64.decodebytes(f))
+        db_session.commit()
+        return common.make_response_packet(1, 'Image Updated Successfully', 'Server Data')
+
+    def get_shopkeeper_picture(self,s):
+        authentic = common.is_user_authenticated()
+        if (not authentic):
+            return common.make_response_packet(4, "User is not authenticated", None)
+        target = os.path.abspath("static/")
+        if (not s['shopkeeper_id']):
+            return common.make_response_packet(5, 'Shopkeeper id is required', None)
+        shop = ShopKeepers.query.filter(ShopKeepers.id == s['shopkeeper_id']).first()
+        if (not shop):
+            return common.make_response_packet(6, 'shopkeeper_id is not valid', None)
+        if shop.image:
+            user_profile_direc = os.path.join(target, shop.user_name+"\profile_pics\\"+shop.image)
+            print(target)
+            print(user_profile_direc)
+
+            with open(user_profile_direc + ".jpg", "rb") as image_file:
+                my_string = base64.b64encode(image_file.read())
+
+            return common.make_response_packet(1, 'success', my_string.decode('utf-8'))
+        else:
+            user_profile_direc = (target + "\\default.jpg")
+            print(target)
+            print(user_profile_direc)
+
+            with open(user_profile_direc, "rb") as image_file:
+                my_string = base64.b64encode(image_file.read())
+
+            return common.make_response_packet(1, 'success', my_string.decode('utf-8'))
 
     def process_login(self,user_name,password,user_type):
         s = None

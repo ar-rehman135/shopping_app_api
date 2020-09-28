@@ -30,4 +30,4 @@ app.register_blueprint(customer_add_shops_api.customer_add_shops_bp)
 
 if __name__ == "__main__":
     init_db()
-    app.run(debug = True,host="192.168.1.2")
+    app.run(debug = True,host="192.168.1.14")
